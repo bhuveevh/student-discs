@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ============== ZAROORI =================
     // Apni Firebase project ki configuration yahan paste karein.
-    // Is file ko public GitHub repo mein keys ke saath commit na karein!
     const firebaseConfig = {
       apiKey: "AIzaSyDox5At1sNhQXF27r_WU0RePiwxhihmKxo",
       authDomain: "student-discs.firebaseapp.com",
@@ -47,16 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribePosts = null;
     let currentView = 'discussions';
 
-    // --- Authentication ---
+    // --- Authentication (FIXED & IMPROVED) ---
     auth.onAuthStateChanged(async user => {
         if (user && user.displayName) {
             currentUser = { uid: user.uid, displayName: user.displayName };
-            await fetchProfile(currentUser.uid); // Cache current user's profile
+            await fetchProfile(currentUser.uid); // Cache profile
             showMainApp();
         } else {
+            // No user or user has no displayName, show login
             currentUser = null;
             mainApp.classList.add('hidden');
             loginContainer.classList.remove('hidden');
+            // Try to auto-fill username from localStorage
+            const savedUsername = localStorage.getItem('forumUsername');
+            if (savedUsername) {
+                usernameInput.value = savedUsername;
+                loginBtn.disabled = false;
+            }
             if (unsubscribePosts) unsubscribePosts();
         }
     });
@@ -66,30 +72,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!/^Student@vh\d{8}$/.test(username)) return alert('Invalid username format.');
         loginBtn.disabled = true;
         loginBtn.textContent = 'Logging in...';
+        
         try {
-            await auth.signInAnonymously();
-            await auth.currentUser.updateProfile({ displayName: username });
-            await db.collection('profiles').doc(auth.currentUser.uid).set({
+            // Step 1: Sign in anonymously
+            const userCredential = await auth.signInAnonymously();
+            const user = userCredential.user;
+
+            // Step 2: Update the profile with displayName
+            await user.updateProfile({ displayName: username });
+            
+            // Step 3: Create the profile document in Firestore
+            await db.collection('profiles').doc(user.uid).set({
                 displayName: username,
                 emoji: '👤'
             }, { merge: true });
+
+            // Step 4: Save username for auto-login next time
+            localStorage.setItem('forumUsername', username);
+            // The onAuthStateChanged listener will automatically handle showing the app.
         } catch (error) {
             console.error("Login Error:", error);
-            alert("Failed to login.");
+            alert("Failed to login. Please check console for details.");
             loginBtn.disabled = false;
             loginBtn.textContent = 'Access Forum';
         }
     };
+    
+    const logout = async () => {
+        const user = auth.currentUser;
+        if(user){
+            // Optional: Delete anonymous user to keep your auth list clean
+            // Be careful with this in production if you want users to "recover" accounts
+            await db.collection('profiles').doc(user.uid).delete();
+            await user.delete();
+        }
+        localStorage.removeItem('forumUsername');
+        // onAuthStateChanged will handle the UI update
+    };
 
-    // --- Data Fetching & Caching ---
+    // --- Data Fetching & Caching (IMPROVED) ---
     const fetchProfile = async (uid) => {
         if (profileCache[uid]) return profileCache[uid];
-        const doc = await db.collection('profiles').doc(uid).get();
-        if (doc.exists) {
-            profileCache[uid] = doc.data();
-            return profileCache[uid];
+        try {
+            const doc = await db.collection('profiles').doc(uid).get();
+            if (doc.exists) {
+                profileCache[uid] = doc.data();
+                return profileCache[uid];
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
         }
-        return { displayName: 'Unknown', emoji: '?' };
+        return { displayName: 'Unknown', emoji: '?' }; // Fallback
+    };
+    
+    // The rest of the functions (listenForPosts, showMainApp, renderPosts, etc.)
+    // are the same as the previous version. They are included here for completeness.
+
+    const showMainApp = () => {
+        sidebarUsername.textContent = currentUser.displayName;
+        profileEmoji.textContent = (profileCache[currentUser.uid] && profileCache[currentUser.uid].emoji) || '👤';
+        loginContainer.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+        listenForPosts();
     };
 
     const listenForPosts = () => {
@@ -102,17 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, err => console.error("Error listening for posts:", err));
     };
 
-    // --- UI Rendering & Updates ---
-    const showMainApp = () => {
-        sidebarUsername.textContent = currentUser.displayName;
-        profileEmoji.textContent = profileCache[currentUser.uid].emoji || '👤';
-        loginContainer.classList.add('hidden');
-        mainApp.classList.remove('hidden');
-        listenForPosts();
-    };
-
     const renderPosts = async (postsToRender) => {
-        postsContainer.innerHTML = '<p>Loading posts...</p>';
+        postsContainer.innerHTML = '<p style="text-align:center; padding: 20px;">Loading posts...</p>';
         if (!postsToRender || postsToRender.length === 0) {
             postsContainer.innerHTML = `<p style="text-align:center; padding: 40px; color: var(--text-secondary);">No posts found for this view.</p>`;
             return;
@@ -161,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (link) link.click();
     };
 
-    // --- Interactivity ---
     profileAvatar.addEventListener('click', async () => {
         const newEmoji = prompt('Enter a single emoji for your profile:', profileEmoji.textContent);
         if (newEmoji) {
@@ -202,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     postsContainer.addEventListener('click', async e => {
-        const button = e.target.closest('button[data-action], .post-author');
+        const button = e.target.closest('button[data-action]');
         if (!button) return;
         const postCard = e.target.closest('.post-card');
         const postId = postCard.dataset.postId;
@@ -210,38 +244,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const postRef = db.collection('posts').doc(postId);
 
         switch (action) {
-            case 'like':
-                postRef.update({
-                    likes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
-                    dislikes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
-                });
-                break;
-            case 'dislike':
-                 postRef.update({
-                    dislikes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
-                    likes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
-                });
-                break;
-            case 'toggle-reply':
-                postCard.querySelector('.replies-section').classList.toggle('hidden');
-                break;
+            case 'like': postRef.update({ likes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), dislikes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid) }); break;
+            case 'dislike': postRef.update({ dislikes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), likes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid) }); break;
+            case 'toggle-reply': postCard.querySelector('.replies-section').classList.toggle('hidden'); break;
             case 'add-reply':
                 const replyInput = postCard.querySelector('.reply-input');
                 const text = replyInput.value.trim();
                 if (text) {
-                    await postRef.update({
-                        replies: firebase.firestore.FieldValue.arrayUnion({ authorId: currentUser.uid, text })
-                    });
+                    await postRef.update({ replies: firebase.firestore.FieldValue.arrayUnion({ authorId: currentUser.uid, text, createdAt: new Date() }) });
                     replyInput.value = '';
                 }
                 break;
         }
     });
 
-    // --- Boilerplate Listeners ---
     document.getElementById('generate-btn').addEventListener('click', () => { usernameInput.value = `Student@vh${Math.floor(10000000 + Math.random() * 90000000)}`; loginBtn.disabled = false; });
     loginBtn.addEventListener('click', login);
-    logoutBtn.addEventListener('click', () => auth.signOut());
+    logoutBtn.addEventListener('click', logout);
     fabCreatePost.addEventListener('click', () => createPostModal.classList.remove('hidden'));
     closeModalBtn.addEventListener('click', () => createPostModal.classList.add('hidden'));
     const toggleSidebar = () => sidebar.classList.toggle('open');
