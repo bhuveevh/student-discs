@@ -18,7 +18,6 @@
         <aside id="sidebar">
             <div class="sidebar-header"><h3>My Account</h3><button id="close-sidebar-btn" class="icon-btn"><i class="fas fa-times"></i></button></div>
             <div class="sidebar-profile">
-                <!-- IMPORTANT: Profile emoji will be shown here -->
                 <div id="profile-avatar" class="profile-avatar" title="Click to change emoji">
                     <span id="profile-emoji"></span>
                 </div>
@@ -32,7 +31,10 @@
                 <a href="#" id="reset-data-btn" data-page="reset"><i class="fas fa-trash-alt"></i> Reset Data</a>
                 <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
-            <div class="sidebar-stats"><div class="stat-item"><span>Posts</span><strong id="post-count">0</strong></div><div class="stat-item"><span>Replies</span><strong id="reply-count">0</strong></div></div>
+            <div class="sidebar-stats">
+                <div class="stat-item"><span>Posts</span><strong id="post-count">0</strong></div>
+                <div class="stat-item"><span>Replies</span><strong id="reply-count">0</strong></div>
+            </div>
         </aside>
 
         <main id="main-content">
@@ -48,12 +50,12 @@
             </div>
         </main>
 
-        <!-- IMPORTANT: Floating Action Button to create a new post -->
+        <!-- Floating Action Button to create a new post -->
         <button id="fab-create-post" class="fab" title="Start a New Discussion">
             <i class="fas fa-plus"></i>
         </button>
 
-        <!-- IMPORTANT: Modal/Popup for creating a new post -->
+        <!-- Modal/Popup for creating a new post -->
         <div id="create-post-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <button id="close-modal-btn" class="close-btn">×</button>
