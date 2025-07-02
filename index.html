@@ -28,13 +28,9 @@
                 <a href="#" class="active" data-page="discussions"><i class="fas fa-comments"></i> Discussions</a>
                 <a href="#" data-page="my-posts"><i class="fas fa-edit"></i> My Posts</a>
                 <a href="#" data-page="my-replies"><i class="fas fa-reply"></i> My Replies</a>
-                <a href="#" id="reset-data-btn" data-page="reset"><i class="fas fa-trash-alt"></i> Reset Data</a>
                 <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
-            <div class="sidebar-stats">
-                <div class="stat-item"><span>Posts</span><strong id="post-count">0</strong></div>
-                <div class="stat-item"><span>Replies</span><strong id="reply-count">0</strong></div>
-            </div>
+            <div class="sidebar-stats"><div class="stat-item"><span>My Posts</span><strong id="post-count">0</strong></div><div class="stat-item"><span>My Replies</span><strong id="reply-count">0</strong></div></div>
         </aside>
 
         <main id="main-content">
@@ -45,17 +41,13 @@
             
             <div class="content-area">
                 <div class="posts-container">
-                    <!-- Posts will be dynamically inserted here -->
+                    <!-- Posts will be dynamically inserted here from Firebase -->
                 </div>
             </div>
         </main>
 
-        <!-- Floating Action Button to create a new post -->
-        <button id="fab-create-post" class="fab" title="Start a New Discussion">
-            <i class="fas fa-plus"></i>
-        </button>
+        <button id="fab-create-post" class="fab" title="Start a New Discussion"><i class="fas fa-plus"></i></button>
 
-        <!-- Modal/Popup for creating a new post -->
         <div id="create-post-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <button id="close-modal-btn" class="close-btn">×</button>
@@ -66,6 +58,13 @@
             </div>
         </div>
     </div>
+    
+    <!-- IMPORTANT: Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Your App's Script -->
     <script src="script.js"></script>
 </body>
 </html>
