@@ -17,13 +17,18 @@
     <div id="main-app" class="hidden">
         <aside id="sidebar">
             <div class="sidebar-header"><h3>My Account</h3><button id="close-sidebar-btn" class="icon-btn"><i class="fas fa-times"></i></button></div>
-            <div class="sidebar-profile"><div class="profile-avatar"><i class="fas fa-user"></i></div><h4 id="sidebar-username">Student@vh...</h4><p>Forum Member</p></div>
+            <div class="sidebar-profile">
+                <!-- IMPORTANT: Profile emoji will be shown here -->
+                <div id="profile-avatar" class="profile-avatar" title="Click to change emoji">
+                    <span id="profile-emoji"></span>
+                </div>
+                <h4 id="sidebar-username">Student@vh...</h4>
+                <p>Forum Member</p>
+            </div>
             <nav id="sidebar-nav" class="sidebar-nav">
                 <a href="#" class="active" data-page="discussions"><i class="fas fa-comments"></i> Discussions</a>
                 <a href="#" data-page="my-posts"><i class="fas fa-edit"></i> My Posts</a>
                 <a href="#" data-page="my-replies"><i class="fas fa-reply"></i> My Replies</a>
-                <a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
-                <!-- NEW: Reset button for testing -->
                 <a href="#" id="reset-data-btn" data-page="reset"><i class="fas fa-trash-alt"></i> Reset Data</a>
                 <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
@@ -33,21 +38,31 @@
         <main id="main-content">
             <header>
                 <div class="header-left"><button id="menu-btn" class="icon-btn"><i class="fas fa-bars"></i></button><h1 class="logo-text">Student Forum</h1></div>
-                <div class="header-right"><div class="search-bar-wrapper"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Search topics..."></div><div id="search-suggestions-container" class="hidden"></div></div><button id="user-profile-btn" class="user-profile-btn"><i class="fas fa-user"></i></button></div>
+                <div class="header-right"><div class="search-bar-wrapper"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Search topics or users..."></div><div id="search-suggestions-container" class="hidden"></div></div><button id="user-profile-btn" class="user-profile-btn"><i class="fas fa-user"></i></button></div>
             </header>
             
             <div class="content-area">
-                <!-- IMPORTANT: New post creation form -->
-                <div class="create-post-card">
-                    <input id="new-post-title-input" type="text" placeholder="Enter a title for your new discussion...">
-                    <textarea id="new-post-content-input" rows="3" placeholder="What's on your mind?"></textarea>
-                    <button id="add-post-btn" class="primary-btn">Post Discussion</button>
-                </div>
                 <div class="posts-container">
                     <!-- Posts will be dynamically inserted here -->
                 </div>
             </div>
         </main>
+
+        <!-- IMPORTANT: Floating Action Button to create a new post -->
+        <button id="fab-create-post" class="fab" title="Start a New Discussion">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- IMPORTANT: Modal/Popup for creating a new post -->
+        <div id="create-post-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <button id="close-modal-btn" class="close-btn">×</button>
+                <h2>Create a New Discussion</h2>
+                <input id="new-post-title-input" type="text" placeholder="Enter a title...">
+                <textarea id="new-post-content-input" rows="5" placeholder="What's on your mind?"></textarea>
+                <button id="add-post-btn" class="primary-btn">Post Discussion</button>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
