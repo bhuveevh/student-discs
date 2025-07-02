@@ -9,24 +9,83 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div id="login-container" class="login-overlay"><div class="login-box"><img src="https://i.ibb.co/bF03M1b/logo.png" alt="Logo" class="login-logo"><h2>Welcome to Student Forum</h2><p>Enter your existing ID or generate a new one to join.</p><div class="input-group"><input type="text" id="username-input" placeholder="Type or Generate Username..."><button id="generate-btn" title="Generate New Username"><i class="fas fa-arrows-rotate"></i></button></div><button id="login-btn" class="primary-btn" disabled>Access Forum</button></div></div>
+    <div id="login-container" class="login-overlay">
+        <div class="login-box">
+            <img src="https://i.ibb.co/bF03M1b/logo.png" alt="Logo" class="login-logo">
+            <h2>Welcome to Student Forum</h2>
+            <p>Generate a unique ID to join the discussion.</p>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="Generate or Enter ID...">
+                <button id="generate-btn" title="Generate New Username"><i class="fas fa-arrows-rotate"></i></button>
+            </div>
+            <button id="login-btn" class="primary-btn" disabled>Access Forum</button>
+        </div>
+    </div>
     <div id="main-app" class="hidden">
         <aside id="sidebar">
-            <div class="sidebar-header"><h3>My Account</h3><button id="close-sidebar-btn" class="icon-btn"><i class="fas fa-times"></i></button></div>
-            <div class="sidebar-profile"><div id="profile-avatar" class="profile-avatar" title="Click to change emoji"><span id="profile-emoji"></span></div><h4 id="sidebar-username">Student@vh...</h4><p>Forum Member</p></div>
-            <nav id="sidebar-nav" class="sidebar-nav"><a href="#" class="active" data-page="discussions"><i class="fas fa-comments"></i> Discussions</a><a href="#" data-page="my-posts"><i class="fas fa-edit"></i> My Posts</a><a href="#" data-page="my-replies"><i class="fas fa-reply"></i> My Replies</a><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></nav>
-            <div class="sidebar-stats"><div class="stat-item"><span>My Posts</span><strong id="post-count">0</strong></div><div class="stat-item"><span>My Replies</span><strong id="reply-count">0</strong></div></div>
+            <div class="sidebar-header">
+                <h3>My Account</h3>
+                <button id="close-sidebar-btn" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sidebar-profile">
+                <div id="profile-avatar" class="profile-avatar" title="Click to change emoji">
+                    <span id="profile-emoji"></span>
+                </div>
+                <h4 id="sidebar-username">Display Name</h4>
+                <p id="sidebar-login-id">@Student...</p>
+            </div>
+            <nav id="sidebar-nav" class="sidebar-nav">
+                <a href="#" class="active" data-page="discussions"><i class="fas fa-comments"></i> Discussions</a>
+                <a href="#" data-page="my-posts"><i class="fas fa-edit"></i> My Posts</a>
+                <a href="#" data-page="my-replies"><i class="fas fa-reply"></i> My Replies</a>
+                <a href="#" id="clear-history-btn"><i class="fas fa-history"></i> Clear History</a>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+            <div class="sidebar-stats">
+                <div class="stat-item"><span>My Posts</span><strong id="post-count">0</strong></div>
+                <div class="stat-item"><span>My Replies</span><strong id="reply-count">0</strong></div>
+            </div>
         </aside>
         <main id="main-content">
             <header>
-                <div class="header-left"><button id="menu-btn" class="icon-btn"><i class="fas fa-bars"></i></button><h1 class="logo-text">Student Forum</h1></div>
-                <div class="header-right"><div class="search-bar-wrapper"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Search topics or users..."></div><div id="search-suggestions-container" class="hidden"></div></div><button id="user-profile-btn" class="user-profile-btn"><i class="fas fa-user"></i></button></div>
+                <div class="header-left">
+                    <button id="menu-btn" class="icon-btn"><i class="fas fa-bars"></i></button>
+                    <h1 class="logo-text">Student Forum</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar-wrapper">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search topics or users...">
+                        </div>
+                        <div id="search-suggestions-container" class="hidden"></div>
+                    </div>
+                    <button id="user-profile-btn" class="user-profile-btn">
+                        <span id="header-profile-emoji"></span>
+                    </button>
+                </div>
             </header>
-            <div class="content-area"><div class="posts-container"></div></div>
+            <div class="content-area">
+                <div class="posts-container"></div>
+            </div>
         </main>
         <button id="fab-create-post" class="fab" title="Start a New Discussion"><i class="fas fa-plus"></i></button>
         <div id="create-post-modal" class="modal-overlay hidden">
-            <div class="modal-content"><button id="close-modal-btn" class="close-btn">×</button><h2>Create a New Discussion</h2><input id="new-post-title-input" type="text" placeholder="Enter a title..."><textarea id="new-post-content-input" rows="5" placeholder="What's on your mind?"></textarea><button id="add-post-btn" class="primary-btn">Post Discussion</button></div>
+            <div class="modal-content">
+                <button class="close-btn" data-modal-id="create-post-modal">×</button>
+                <h2>Create Discussion</h2>
+                <input id="new-post-title-input" type="text" placeholder="Enter a title...">
+                <textarea id="new-post-content-input" rows="5" placeholder="What's on your mind?"></textarea>
+                <button id="add-post-btn" class="primary-btn">Post Discussion</button>
+            </div>
+        </div>
+        <div id="set-name-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2 class="modal-title">Set Your Display Name</h2>
+                <p>Please set a public name to continue. This name will be visible to everyone.</p>
+                <input id="set-name-input" type="text" placeholder="Enter your public name...">
+                <button id="set-name-btn" class="primary-btn">Save Name</button>
+            </div>
         </div>
     </div>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
